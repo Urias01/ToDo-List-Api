@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgre_todo_develop:
+    container_name: todo-develop
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=todo-develop
+
+  postgre_todo_test:
+    container_name: todo-test
+    image: postgres
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=todo-test
+
+  postgre_todo:
+    container_name: todo
+    image: postgres
+    ports:
+      - 5434:5432
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=todo
