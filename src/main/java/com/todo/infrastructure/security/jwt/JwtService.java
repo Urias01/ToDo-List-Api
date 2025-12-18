@@ -37,7 +37,7 @@ public class JwtService {
     }
   }
 
-  public String generateToken(String userId, String tenantId) {
+  public String generateToken(String userId) {
     return JWT.create()
         .withIssuer(appProperties.getJwtIssuer())
         .withSubject(userId)
