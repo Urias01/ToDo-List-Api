@@ -12,4 +12,6 @@ public class AppProperties {
 
   private String jwtSecret;
   private String jwtIssuer;
+  private String globalUserEmail;
+  private String globalUserPassword;
 }
