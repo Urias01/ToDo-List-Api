@@ -24,7 +24,7 @@ public class SignIn {
 
   public AuthResponse execute(AuthRequest request) {
     User user = userQueryRepository.findByEmail(request.email())
-        .orElseThrow(() -> new NotFoundException("User"));
+        .orElseThrow(() -> new AuthenticationException(""));
 
     if (!passwordEncoder.matches(request.password(), user.getPassword())) {
       throw new AuthenticationException("Invalid email or password");
