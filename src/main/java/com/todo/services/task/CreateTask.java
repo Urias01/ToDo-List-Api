@@ -1,5 +1,6 @@
 package com.todo.services.task;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ import com.todo.models.entities.Task;
 import com.todo.models.entities.User;
 import com.todo.models.requests.TaskRequest;
 import com.todo.ports.task.ITaskCommandRepository;
+import com.todo.ports.task.ITaskQueryRepository;
 import com.todo.ports.user.IUserQueryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class CreateTask {
 
   private final IUserQueryRepository userQueryRepository;
   private final ITaskCommandRepository taskCommandRepository;
+  private final ITaskQueryRepository taskQueryRepository;
 
   public String execute(TaskRequest request) {
     Task task = TaskMapper.toEntity(request);
@@ -30,9 +33,16 @@ public class CreateTask {
       return task.getId();
     }
 
+    Task parentTask = taskQueryRepository.findById(request.taskId()).orElse(null);
+
+    if (parentTask != null) {
+      task.setParentTask(parentTask);
+    }
+
     Set<User> users = request.userIds().stream()
         .map(userId -> {
-          User user = userQueryRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with id " + userId));
+          User user = userQueryRepository.findById(userId)
+              .orElseThrow(() -> new NotFoundException("User with id " + userId));
           return user;
         })
         .collect(Collectors.toSet());

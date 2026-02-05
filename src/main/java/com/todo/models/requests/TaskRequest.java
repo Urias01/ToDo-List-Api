@@ -11,9 +11,10 @@ public record TaskRequest(
     String title,
     String description,
     List<String> userIds,
+    String taskId,
     @JsonProperty(defaultValue = "PENDING") TaskStatus status) {
   public TaskRequest {
-    if(!StringUtils.hasText(title)) {
+    if (!StringUtils.hasText(title)) {
       throw new IllegalArgumentException("Title cannot be null or empty");
     }
     if (status == null) {

@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,5 +42,8 @@ public class Task extends Auditable {
   @ManyToMany
   @JoinTable(name = "user_tasks", joinColumns = @JoinColumn(name = "task_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
   private Set<User> users = new HashSet<>();
+  @ManyToOne
+  @JoinColumn(name = "parent_id", referencedColumnName = "id")
+  private Task parentTask;
 
 }
