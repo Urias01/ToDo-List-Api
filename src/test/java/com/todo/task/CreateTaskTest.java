@@ -1,6 +1,7 @@
 package com.todo.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -112,5 +113,40 @@ public class CreateTaskTest {
     verify(userQueryRepository).findById(userId);
     verify(taskQueryRepository).findById(parentId);
     verify(taskCommandRepository).save(Mockito.any(Task.class));
+  }
+
+  @Test
+  @DisplayName("Should not create a subtask of subtask")
+  public void shouldNotCreateSubtaskOfSubtask() {
+    String userId = "user-123";
+    String parentId = "task-123";
+
+    List<String> users = List.of(userId);
+
+    Task parentTask = new Task();
+    parentTask.setId(parentId);
+
+    Task grandParent = new Task();
+    grandParent.setId("grand-parent");
+
+    parentTask.setParentTask(grandParent);
+
+    TaskRequest request = new TaskRequest(
+        "Test Task",
+        "This is a test task",
+        users,
+        parentId,
+        null);
+
+    User user = new User();
+    user.setId(userId);
+
+    when(taskQueryRepository.findById(parentId)).thenReturn(Optional.of(parentTask));
+
+    IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+        () -> createTask.execute(request));
+
+    assertEquals("Cannot set a parent task that is already a subtask",
+        ex.getMessage());
   }
 }
