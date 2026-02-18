@@ -35,6 +35,10 @@ public class CreateTask {
 
     Task parentTask = taskQueryRepository.findById(request.taskId()).orElse(null);
 
+    if (parentTask.getParentTask() != null) {
+      throw new IllegalArgumentException("Cannot set a parent task that is already a subtask");
+    }
+
     if (parentTask != null) {
       task.setParentTask(parentTask);
     }
