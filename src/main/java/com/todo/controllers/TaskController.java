@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.todo.infrastructure.security.jwt.IJwtAuthContext;
 import com.todo.models.requests.TaskRequest;
 import com.todo.models.responses.ApiResponse;
 import com.todo.services.task.CreateTask;
@@ -18,10 +19,11 @@ import lombok.RequiredArgsConstructor;
 public class TaskController {
 
   private final CreateTask createTask;
+  private final IJwtAuthContext jwtAuthContext;
 
   @PostMapping
   public ResponseEntity<ApiResponse<String>> createTask(@RequestBody TaskRequest request) {
-    String taskId = createTask.execute(request);
+    String taskId = createTask.execute(request, jwtAuthContext.getUserId());
     return ResponseEntity.ok(ApiResponse.success(taskId));
   }
 }

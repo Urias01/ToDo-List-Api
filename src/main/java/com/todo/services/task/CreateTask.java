@@ -15,6 +15,7 @@ import com.todo.ports.task.ITaskCommandRepository;
 import com.todo.ports.task.ITaskQueryRepository;
 import com.todo.ports.user.IUserQueryRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,35 +26,35 @@ public class CreateTask {
   private final ITaskCommandRepository taskCommandRepository;
   private final ITaskQueryRepository taskQueryRepository;
 
-  public String execute(TaskRequest request) {
-    Task task = TaskMapper.toEntity(request);
+  @Transactional
+  public String execute(TaskRequest request, String loggedUserId) {
 
-    if (request.userIds() == null || request.userIds().isEmpty()) {
-      taskCommandRepository.save(task);
+    User creator = userQueryRepository.findById(loggedUserId)
+        .orElseThrow(() -> new NotFoundException("Creator user"));
+
+    Task task = TaskMapper.toEntity(request, creator);
+
+    if (request.userIds() != null && !request.userIds().isEmpty()) {
+      Set<User> users = request.userIds().stream()
+          .map(userId -> userQueryRepository.findById(userId)
+              .orElseThrow(() -> new NotFoundException("User with id " + userId)))
+          .collect(Collectors.toSet());
+
+      task.assignUsers(users);
+    }
+
+    if (request.taskId() != null) {
+      Optional<Task> parentTaskOpt = taskQueryRepository.findById(request.taskId());
+      if (parentTaskOpt.isEmpty()) {
+        throw new NotFoundException("Parent task with id " + request.taskId());
+      }
+      Task parent = parentTaskOpt.get();
+      parent.addSubtask(task);
+      taskCommandRepository.update(parent);
       return task.getId();
+    } else {
+      task = taskCommandRepository.create(task);
     }
-
-    Task parentTask = taskQueryRepository.findById(request.taskId()).orElse(null);
-
-    if (parentTask.getParentTask() != null) {
-      throw new IllegalArgumentException("Cannot set a parent task that is already a subtask");
-    }
-
-    if (parentTask != null) {
-      task.setParentTask(parentTask);
-    }
-
-    Set<User> users = request.userIds().stream()
-        .map(userId -> {
-          User user = userQueryRepository.findById(userId)
-              .orElseThrow(() -> new NotFoundException("User with id " + userId));
-          return user;
-        })
-        .collect(Collectors.toSet());
-
-    task.setUsers(users);
-
-    taskCommandRepository.save(task);
 
     return task.getId();
   }

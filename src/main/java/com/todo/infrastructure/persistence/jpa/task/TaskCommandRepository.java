@@ -10,12 +10,17 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class TaskCommandRepository implements ITaskCommandRepository {
-  
+
   private final TaskRepository taskRepository;
 
   @Override
-  public Task save(Task task) {
+  public Task create(Task task) {
     return taskRepository.save(task);
   }
-  
+
+  @Override
+  public Task update(Task task) {
+    return taskRepository.save(task);
+  }
+
 }

@@ -3,7 +3,7 @@ package com.todo.models.enums;
 public enum TaskStatus {
   PENDING("PENDING"),
   IN_PROGRESS("IN_PROGRESS"),
-  COMPLETED("COMPLETED"),
+  FINISHED("FINISHED"),
   CANCELLED("CANCELLED");
 
   private String status;

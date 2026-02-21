@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +24,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User extends Auditable {
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
@@ -32,5 +33,7 @@ public class User extends Auditable {
   private String password;
   @ManyToMany(mappedBy = "users")
   private Set<Task> tasks = new HashSet<>();
-  
+  @OneToMany(mappedBy = "createdBy")
+  private Set<Task> createdTasks = new HashSet<>();
+
 }
