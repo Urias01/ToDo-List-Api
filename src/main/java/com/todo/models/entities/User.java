@@ -31,7 +31,7 @@ public class User extends Auditable {
   private String name;
   private String email;
   private String password;
-  @ManyToMany(mappedBy = "users")
+  @ManyToMany(mappedBy = "responsibles")
   private Set<Task> tasks = new HashSet<>();
   @OneToMany(mappedBy = "createdBy")
   private Set<Task> createdTasks = new HashSet<>();

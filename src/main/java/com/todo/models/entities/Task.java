@@ -22,8 +22,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.AccessLevel;
 
 @Entity
 @Table(name = "tasks")
@@ -49,7 +47,7 @@ public class Task extends Auditable {
 
   @ManyToMany
   @JoinTable(name = "user_tasks", joinColumns = @JoinColumn(name = "task_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-  private Set<User> users = new HashSet<>();
+  private Set<User> responsibles = new HashSet<>();
 
   @ManyToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
@@ -93,11 +91,19 @@ public class Task extends Auditable {
       throw new IllegalStateException("Subtasks cannot have their own subtasks");
     }
 
+    if (this.status == TaskStatus.CANCELLED) {
+      throw new IllegalStateException("Cannot add subtasks to a cancelled task");
+    }
+
     if (subtask == null)
       throw new IllegalArgumentException("Subtask cannot be null");
 
     if (subtask.parentTask != null)
       throw new IllegalStateException("Task already has a parent");
+
+    if (this.status == TaskStatus.FINISHED) {
+      this.status = TaskStatus.IN_PROGRESS;
+    }
 
     this.subtasks.add(subtask);
     subtask.parentTask = this;
@@ -118,22 +124,129 @@ public class Task extends Auditable {
     }
   }
 
-  public void assignUsers(Set<User> users) {
-    if (users == null || users.isEmpty()) {
+  public void addResponsible(User executor, User newResponsible) {
+
+    if (!this.createdBy.equals(executor)) {
+      throw new IllegalAccessError("Just creator can add a responsible in task");
+    }
+
+    if (newResponsible == null) {
       return;
     }
-    this.users.addAll(users);
+
+    validateResponsibleLimit(this.responsibles);
+
+    if (this.responsibles.contains(newResponsible)) {
+      throw new IllegalStateException("This user is already assigned in this task");
+    }
+
+    if (this.parentTask != null) {
+      this.parentTask.responsibles.stream().map(User::getId)
+          .forEach(responsibleId -> {
+            if (responsibleId.equals(newResponsible.getId())) {
+              throw new IllegalStateException(
+                  "Cannot assign " + newResponsible.getName()
+                      + " because they are not responsible for the parent task");
+            }
+          });
+    }
+
+    this.responsibles.add(newResponsible);
+  }
+
+  public void removeResponsible(User executor, User responsible) {
+
+    if (!this.createdBy.equals(executor)) {
+      throw new IllegalStateException("Just creator remove a responsible");
+    }
+
+    if (responsible == null) {
+      return;
+    }
+
+    if (this.responsibles.size() < 1) {
+      throw new IllegalStateException(
+          "It is not possible to remove the person responsible, as this task does not have a person responsible.");
+    }
+
+    if (!this.responsibles.contains(responsible)) {
+      throw new IllegalStateException("User not assigned");
+    }
+
+    this.responsibles.remove(responsible);
+    this.subtasks.stream().forEach(sub -> sub.responsibles.remove(responsible));
+  }
+
+  public void assignResponsibleToSubtask(
+      Task subtask,
+      User executor,
+      User responsible) {
+    if (!executor.equals(this.createdBy)) {
+      if (!executor.equals(responsible))
+        throw new IllegalStateException("Just creator assign diferent responsible");
+
+      if (!this.responsibles.contains(executor))
+        throw new IllegalStateException("Executor is not responsible of parent task");
+    }
+
+    validateResponsibleLimit(subtask.responsibles);
+
+    if (!this.responsibles.contains(responsible)) {
+      throw new IllegalStateException("Cannot self assign in this task");
+    }
+
+    if (subtask.responsibles.contains(responsible)) {
+      throw new IllegalStateException("This user arealdy assigned in this task");
+    }
+
+    subtask.responsibles.add(responsible);
+  }
+
+  private void validateResponsibleLimit(Set<User> responsibles) {
+    if (responsibles.size() >= 2) {
+      throw new IllegalStateException("A task cannot have more than 2 responsibles");
+    }
   }
 
   public void changeStatus(TaskStatus newStatus) {
+    switch (newStatus) {
+      case PENDING -> pending();
+      case IN_PROGRESS -> inProgress();
+      case CANCELLED -> cancelled();
+      case FINISHED -> finish();
+    }
+  }
 
-    if (newStatus == null)
-      throw new IllegalArgumentException("Status cannot be null");
+  public void pending() {
+    if (!this.status.equals(TaskStatus.FINISHED)) {
+      throw new IllegalStateException("Invalid transition");
+    }
 
-    if (this.status == TaskStatus.FINISHED)
-      throw new IllegalStateException("Cannot change a finished task");
+    boolean hasActiveSubtasks = this.subtasks.stream()
+        .anyMatch(sub -> !sub.getStatus().equals(TaskStatus.PENDING)
+            && !sub.getStatus().equals(TaskStatus.CANCELLED));
 
-    this.status = newStatus;
+    if (hasActiveSubtasks) {
+      throw new IllegalStateException("Cannot change status to pending with subtasks in progress or finished");
+    }
+
+    this.status = TaskStatus.PENDING;
+  }
+
+  public void inProgress() {
+    if (!this.status.equals(TaskStatus.PENDING) && !this.status.equals(TaskStatus.CANCELLED)) {
+      throw new IllegalStateException("Invalid transition");
+    }
+
+    this.status = TaskStatus.IN_PROGRESS;
+  }
+
+  public void cancelled() {
+    if (this.status.equals(TaskStatus.FINISHED)) {
+      throw new IllegalStateException("Cannot cancell finished task");
+    }
+
+    this.status = TaskStatus.CANCELLED;
   }
 
   public void finish() {
@@ -151,6 +264,17 @@ public class Task extends Auditable {
 
     this.status = TaskStatus.FINISHED;
     this.finishDate = LocalDateTime.now();
+  }
+
+  public void ensureCanCreateSubtask(User creator) {
+    boolean isCreator = this.getCreatedBy().equals(creator);
+    boolean isResponsible = this.getResponsibles().contains(creator);
+
+    if (!isCreator && !isResponsible) {
+      throw new IllegalStateException("You can't create a subtask");
+    }
+
+    return;
   }
 
 }

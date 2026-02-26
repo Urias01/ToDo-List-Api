@@ -34,5 +34,9 @@ public class GlobalException {
   public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
   }
-}
 
+  @ExceptionHandler(IllegalAccessException.class)
+  public ResponseEntity<ApiResponse<Void>> handleIllegalAccessException(IllegalAccessException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
+  }
+}

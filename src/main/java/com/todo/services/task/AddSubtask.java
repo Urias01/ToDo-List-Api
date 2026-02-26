@@ -9,8 +9,9 @@ import com.todo.exceptions.NotFoundException;
 import com.todo.mappers.TaskMapper;
 import com.todo.models.entities.Task;
 import com.todo.models.entities.User;
-import com.todo.models.requests.TaskRequest;
+import com.todo.models.requests.SubTaskRequest;
 import com.todo.ports.task.ITaskCommandRepository;
+import com.todo.ports.task.ITaskQueryRepository;
 import com.todo.ports.user.IUserQueryRepository;
 
 import jakarta.transaction.Transactional;
@@ -18,18 +19,30 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CreateTask {
+public class AddSubtask {
 
   private final IUserQueryRepository userQueryRepository;
   private final ITaskCommandRepository taskCommandRepository;
+  private final ITaskQueryRepository taskQueryRepository;
 
   @Transactional
-  public String execute(TaskRequest request, String loggedUserId) {
+  public String execute(SubTaskRequest request, String loggedUserId) {
 
     User creator = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Creator user"));
 
-    Task newTask = TaskMapper.toEntity(request, creator);
+    Task newSubTask = TaskMapper.toEntity(request, creator);
+
+    if (request.parentId() == null) {
+      throw new IllegalArgumentException("Cannot create subtask without parent task");
+    }
+
+    Task parent = taskQueryRepository.findById(request.parentId())
+        .orElseThrow(() -> new NotFoundException("Parent task"));
+
+    parent.ensureCanCreateSubtask(creator);
+
+    parent.addSubtask(newSubTask);
 
     if (request.userIds() != null && !request.userIds().isEmpty()) {
       Set<User> users = request.userIds().stream()
@@ -37,10 +50,11 @@ public class CreateTask {
               .orElseThrow(() -> new NotFoundException("User with id " + userId)))
           .collect(Collectors.toSet());
 
-      users.forEach(user -> newTask.addResponsible(creator, user));
+      users.forEach(user -> parent.assignResponsibleToSubtask(newSubTask, creator, user));
     }
 
-    Task savedTask = taskCommandRepository.create(newTask);
-    return savedTask.getId();
+    taskCommandRepository.update(parent);
+
+    return newSubTask.getId();
   }
 }
