@@ -35,8 +35,30 @@ public class GlobalException {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
   }
 
-  @ExceptionHandler(IllegalAccessException.class)
-  public ResponseEntity<ApiResponse<Void>> handleIllegalAccessException(IllegalAccessException ex) {
+  @ExceptionHandler(CannotBeNullException.class)
+  public ResponseEntity<ApiResponse<Void>> handleCannotBeNullException(CannotBeNullException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
+  }
+
+  @ExceptionHandler(SubtaskAlreadyHasParentException.class)
+  public ResponseEntity<ApiResponse<Void>> handleSubtaskAlreadyHasParentException(SubtaskAlreadyHasParentException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
+  }
+
+  @ExceptionHandler(TaskAlreadyFinishedException.class)
+  public ResponseEntity<ApiResponse<Void>> handleTaskAlreadyFinishedException(TaskAlreadyFinishedException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
+  }
+
+  @ExceptionHandler(CannotAddSubtaskToCancelledTaskException.class)
+  public ResponseEntity<ApiResponse<Void>> handleCannotAddSubtaskToCancelledTaskException(
+      CannotAddSubtaskToCancelledTaskException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
+  }
+
+  @ExceptionHandler(MaxResponsiblesReachedException.class)
+  public ResponseEntity<ApiResponse<Void>> handleMaxResponsiblesReachedException(
+      MaxResponsiblesReachedException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
   }
 }

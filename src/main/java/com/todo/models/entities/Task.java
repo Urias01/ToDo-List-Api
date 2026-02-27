@@ -4,6 +4,12 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.todo.exceptions.CannotAddSubtaskToCancelledTaskException;
+import com.todo.exceptions.CannotBeNullException;
+import com.todo.exceptions.MaxResponsiblesReachedException;
+import com.todo.exceptions.SubtaskAlreadyHasParentException;
+import com.todo.exceptions.TaskAlreadyFinishedException;
+import com.todo.exceptions.UserNotAllowedToAssignResponsibleException;
 import com.todo.models.common.Auditable;
 import com.todo.models.enums.TaskStatus;
 
@@ -73,14 +79,14 @@ public class Task extends Auditable {
       throw new IllegalArgumentException("Title is required");
 
     if (this.status == TaskStatus.FINISHED)
-      throw new IllegalStateException("Cannot rename a finished task");
+      throw new TaskAlreadyFinishedException();
 
     this.title = title;
   }
 
   public void updateDescription(String description) {
     if (this.status == TaskStatus.FINISHED)
-      throw new IllegalStateException("Cannot update description of a finished task");
+      throw new TaskAlreadyFinishedException();
 
     this.description = description;
   }
@@ -88,18 +94,17 @@ public class Task extends Auditable {
   public void addSubtask(Task subtask) {
 
     if (this.parentTask != null) {
-      throw new IllegalStateException("Subtasks cannot have their own subtasks");
-    }
-
-    if (this.status == TaskStatus.CANCELLED) {
-      throw new IllegalStateException("Cannot add subtasks to a cancelled task");
+      throw new SubtaskAlreadyHasParentException();
     }
 
     if (subtask == null)
-      throw new IllegalArgumentException("Subtask cannot be null");
+      throw new CannotBeNullException("Subtask");
+
+    if (this.status == TaskStatus.CANCELLED)
+      throw new CannotAddSubtaskToCancelledTaskException();
 
     if (subtask.parentTask != null)
-      throw new IllegalStateException("Task already has a parent");
+      throw new SubtaskAlreadyHasParentException();
 
     if (this.status == TaskStatus.FINISHED) {
       this.status = TaskStatus.IN_PROGRESS;
@@ -127,7 +132,7 @@ public class Task extends Auditable {
   public void addResponsible(User executor, User newResponsible) {
 
     if (!this.createdBy.equals(executor)) {
-      throw new IllegalAccessError("Just creator can add a responsible in task");
+      throw new UserNotAllowedToAssignResponsibleException();
     }
 
     if (newResponsible == null) {
@@ -157,7 +162,7 @@ public class Task extends Auditable {
   public void removeResponsible(User executor, User responsible) {
 
     if (!this.createdBy.equals(executor)) {
-      throw new IllegalStateException("Just creator remove a responsible");
+      throw new UserNotAllowedToAssignResponsibleException();
     }
 
     if (responsible == null) {
@@ -183,7 +188,7 @@ public class Task extends Auditable {
       User responsible) {
     if (!executor.equals(this.createdBy)) {
       if (!executor.equals(responsible))
-        throw new IllegalStateException("Just creator assign diferent responsible");
+        throw new UserNotAllowedToAssignResponsibleException();
 
       if (!this.responsibles.contains(executor))
         throw new IllegalStateException("Executor is not responsible of parent task");
@@ -204,7 +209,7 @@ public class Task extends Auditable {
 
   private void validateResponsibleLimit(Set<User> responsibles) {
     if (responsibles.size() >= 2) {
-      throw new IllegalStateException("A task cannot have more than 2 responsibles");
+      throw new MaxResponsiblesReachedException();
     }
   }
 
@@ -219,7 +224,7 @@ public class Task extends Auditable {
 
   public void pending() {
     if (!this.status.equals(TaskStatus.FINISHED)) {
-      throw new IllegalStateException("Invalid transition");
+      throw new TaskAlreadyFinishedException();
     }
 
     boolean hasActiveSubtasks = this.subtasks.stream()
@@ -243,7 +248,7 @@ public class Task extends Auditable {
 
   public void cancelled() {
     if (this.status.equals(TaskStatus.FINISHED)) {
-      throw new IllegalStateException("Cannot cancell finished task");
+      throw new TaskAlreadyFinishedException();
     }
 
     this.status = TaskStatus.CANCELLED;
@@ -252,7 +257,7 @@ public class Task extends Auditable {
   public void finish() {
 
     if (this.status == TaskStatus.FINISHED) {
-      throw new IllegalStateException("Task already finished");
+      throw new TaskAlreadyFinishedException();
     }
 
     boolean hasPendingSubtasks = this.subtasks.stream()
