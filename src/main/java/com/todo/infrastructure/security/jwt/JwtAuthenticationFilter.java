@@ -10,8 +10,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.todo.models.entities.User;
-import com.todo.ports.user.IUserQueryRepository;
+import com.todo.domain.user.entities.User;
+import com.todo.application.ports.user.IUserQueryRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

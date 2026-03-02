@@ -1,11 +1,11 @@
 package com.todo.mappers;
 
-import com.todo.models.entities.Task;
-import com.todo.models.entities.User;
-import com.todo.models.enums.TaskStatus;
-import com.todo.models.requests.SubTaskRequest;
-import com.todo.models.requests.TaskRequest;
-import com.todo.models.requests.TaskRequestUpdate;
+import com.todo.domain.task.entities.Task;
+import com.todo.domain.task.presentation.requests.SubTaskRequest;
+import com.todo.domain.task.presentation.requests.TaskRequest;
+import com.todo.domain.task.presentation.requests.TaskRequestUpdate;
+import com.todo.domain.user.entities.User;
+import com.todo.domain.task.enums.TaskStatus;
 
 public class TaskMapper {
 

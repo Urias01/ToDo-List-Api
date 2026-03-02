@@ -5,7 +5,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.todo.models.responses.ApiResponse;
+import com.todo.domain.task.exception.CannotAddSubtaskToCancelledTaskException;
+import com.todo.domain.task.exception.CannotBeNullException;
+import com.todo.domain.task.exception.MaxResponsiblesReachedException;
+import com.todo.domain.task.exception.SubtaskAlreadyHasParentException;
+import com.todo.domain.task.exception.TaskAlreadyFinishedException;
+import com.todo.domain.common.presentation.response.ApiResponse;
+import com.todo.domain.common.exceptions.NotFoundException;
+import com.todo.domain.common.exceptions.BadRequestException;
+import com.todo.application.exceptions.AlreadyExistsException;
+import com.todo.domain.user.expections.AuthenticationException;
 
 @RestControllerAdvice
 public class GlobalException {

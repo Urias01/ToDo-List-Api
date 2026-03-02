@@ -4,9 +4,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 
-import com.todo.models.entities.User;
-import com.todo.ports.user.IUserCommandRepository;
-import com.todo.ports.user.IUserQueryRepository;
+import com.todo.domain.user.entities.User;
+import com.todo.application.ports.user.IUserCommandRepository;
+import com.todo.application.ports.user.IUserQueryRepository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;

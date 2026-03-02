@@ -13,17 +13,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.todo.exceptions.AuthenticationException;
+import com.todo.domain.user.entities.User;
+import com.todo.domain.user.presentation.request.AuthRequest;
+import com.todo.domain.user.expections.AuthenticationException;
 import com.todo.infrastructure.security.jwt.JwtService;
-import com.todo.models.entities.User;
-import com.todo.models.requests.AuthRequest;
-import com.todo.models.responses.AuthResponse;
-import com.todo.ports.user.IUserQueryRepository;
-import com.todo.services.auth.SignIn;
+import com.todo.domain.user.presentation.response.AuthResponse;
+import com.todo.application.ports.user.IUserQueryRepository;
+import com.todo.application.usecase.auth.SignIn;
 
 @ExtendWith(MockitoExtension.class)
 public class SignInTest {
-  
+
   @InjectMocks
   private SignIn signIn;
 
@@ -33,7 +33,7 @@ public class SignInTest {
   private JwtService jwtService;
   @Mock
   private PasswordEncoder passwordEncoder;
-  
+
   @Test
   @DisplayName("Should sign in user successfully")
   public void shouldSignInUserSuccessfully() {

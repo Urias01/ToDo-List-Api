@@ -4,15 +4,15 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.todo.models.entities.User;
-import com.todo.ports.user.IUserQueryRepository;
+import com.todo.domain.user.entities.User;
+import com.todo.application.ports.user.IUserQueryRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
 public class UserQueryRepositoryImpl implements IUserQueryRepository {
-  
+
   private final UserRepository userRepository;
 
   @Override

@@ -1,7 +1,7 @@
 package com.todo.mappers;
 
-import com.todo.models.entities.User;
-import com.todo.models.requests.UserRequest;
+import com.todo.domain.user.entities.User;
+import com.todo.domain.user.presentation.request.UserRequest;
 
 public class UserMapper {
 

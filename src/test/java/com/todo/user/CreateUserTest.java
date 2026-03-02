@@ -15,12 +15,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.todo.exceptions.BadRequestException;
-import com.todo.models.entities.User;
-import com.todo.models.requests.UserRequest;
-import com.todo.ports.user.IUserCommandRepository;
-import com.todo.ports.user.IUserQueryRepository;
-import com.todo.services.user.CreateUser;
+import com.todo.domain.user.entities.User;
+import com.todo.domain.user.presentation.request.UserRequest;
+import com.todo.domain.common.exceptions.BadRequestException;
+import com.todo.application.exceptions.AlreadyExistsException;
+import com.todo.application.ports.user.IUserCommandRepository;
+import com.todo.application.ports.user.IUserQueryRepository;
+import com.todo.application.usecase.user.CreateUser;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateUserTest {
@@ -63,7 +64,7 @@ public class CreateUserTest {
 
     when(userQueryRepository.findByEmail(request.email())).thenReturn(Optional.of(existingUser));
 
-    assertThrows(com.todo.exceptions.AlreadyExistsException.class, () -> {
+    assertThrows(AlreadyExistsException.class, () -> {
       createUser.execute(request);
     });
   }

@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.todo.models.entities.Task;
-import com.todo.ports.task.ITaskQueryRepository;
+import com.todo.domain.task.entities.Task;
+import com.todo.application.ports.task.ITaskQueryRepository;
 
 import lombok.RequiredArgsConstructor;
 
