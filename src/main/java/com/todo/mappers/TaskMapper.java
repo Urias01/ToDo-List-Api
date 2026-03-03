@@ -24,8 +24,5 @@ public class TaskMapper {
   public static void updateEntity(Task task, TaskRequestUpdate request) {
     task.rename(request.title());
     task.updateDescription(request.description());
-    if (request.status() != null) {
-      task.changeStatus(TaskStatus.valueOf(request.status()));
-    }
   }
 }

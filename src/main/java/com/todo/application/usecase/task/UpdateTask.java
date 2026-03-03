@@ -1,8 +1,11 @@
 package com.todo.application.usecase.task;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.todo.domain.task.entities.Task;
+import com.todo.domain.user.entities.User;
 import com.todo.domain.task.presentation.requests.TaskRequestUpdate;
 import com.todo.domain.common.exceptions.NotFoundException;
 import com.todo.mappers.TaskMapper;
@@ -20,9 +23,17 @@ public class UpdateTask {
   private final ITaskQueryRepository taskQueryRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public String execute(String taskId, TaskRequestUpdate request) {
+  public String execute(TaskRequestUpdate request, String taskId, String loggedUserId) {
+    Optional<User> executor = userQueryRepository.findById(loggedUserId);
+
+    if (executor.isEmpty()) {
+      throw new NotFoundException("loggeder user");
+    }
+
     Task task = taskQueryRepository.findById(taskId)
         .orElseThrow(() -> new NotFoundException("Task"));
+
+    task.assertUserCanModify(executor.get());
 
     TaskMapper.updateEntity(task, request);
 

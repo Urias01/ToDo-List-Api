@@ -40,7 +40,7 @@ public class AddSubtask {
     Task parent = taskQueryRepository.findById(request.parentId())
         .orElseThrow(() -> new NotFoundException("Parent task"));
 
-    parent.ensureCanCreateSubtask(creator);
+    parent.assertUserCanModify(creator);
 
     parent.addSubtask(newSubTask);
 

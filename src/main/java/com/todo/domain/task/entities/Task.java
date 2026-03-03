@@ -12,6 +12,7 @@ import com.todo.domain.task.exception.MaxResponsiblesReachedException;
 import com.todo.domain.task.exception.SubtaskAlreadyHasParentException;
 import com.todo.domain.task.exception.TaskAlreadyFinishedException;
 import com.todo.domain.task.exception.UserNotAllowedToAssignResponsibleException;
+import com.todo.domain.task.exception.UserNotAllowedToPerformActionInTask;
 import com.todo.domain.user.entities.User;
 
 import jakarta.persistence.CascadeType;
@@ -272,12 +273,12 @@ public class Task extends Auditable {
     this.finishDate = LocalDateTime.now();
   }
 
-  public void ensureCanCreateSubtask(User creator) {
+  public void assertUserCanModify(User creator) {
     boolean isCreator = this.getCreatedBy().equals(creator);
     boolean isResponsible = this.getResponsibles().contains(creator);
 
     if (!isCreator && !isResponsible) {
-      throw new IllegalStateException("You can't create a subtask");
+      throw new UserNotAllowedToPerformActionInTask();
     }
 
     return;

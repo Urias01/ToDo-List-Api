@@ -10,6 +10,7 @@ import com.todo.domain.task.exception.CannotBeNullException;
 import com.todo.domain.task.exception.MaxResponsiblesReachedException;
 import com.todo.domain.task.exception.SubtaskAlreadyHasParentException;
 import com.todo.domain.task.exception.TaskAlreadyFinishedException;
+import com.todo.domain.task.exception.UserNotAllowedToPerformActionInTask;
 import com.todo.domain.common.presentation.response.ApiResponse;
 import com.todo.domain.common.exceptions.NotFoundException;
 import com.todo.domain.common.exceptions.BadRequestException;
@@ -69,5 +70,11 @@ public class GlobalException {
   public ResponseEntity<ApiResponse<Void>> handleMaxResponsiblesReachedException(
       MaxResponsiblesReachedException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
+  }
+
+  @ExceptionHandler(UserNotAllowedToPerformActionInTask.class)
+  public ResponseEntity<ApiResponse<Void>> handleUserNotAllowedToPerformActionInTask(
+      UserNotAllowedToPerformActionInTask ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.failure(ex.getMessage()));
   }
 }
