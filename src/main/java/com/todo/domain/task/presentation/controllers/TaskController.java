@@ -1,5 +1,7 @@
 package com.todo.domain.task.presentation.controllers;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,15 +30,15 @@ public class TaskController {
   private final IJwtAuthContext jwtAuthContext;
 
   @PostMapping
-  public ResponseEntity<ApiResponse<String>> createTask(@RequestBody TaskRequest request) {
-    String taskId = createTask.execute(request, jwtAuthContext.getUserId());
+  public ResponseEntity<ApiResponse<UUID>> createTask(@RequestBody TaskRequest request) {
+    UUID taskId = createTask.execute(request, jwtAuthContext.getUserId());
     return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(taskId));
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<ApiResponse<String>> updateTask(@PathVariable String id,
+  public ResponseEntity<ApiResponse<UUID>> updateTask(@PathVariable UUID id,
       @RequestBody TaskRequestUpdate request) {
-    String taskId = updateTask.execute(request, id, jwtAuthContext.getUserId());
+    UUID taskId = updateTask.execute(request, id, jwtAuthContext.getUserId());
     return ResponseEntity.ok(ApiResponse.success(taskId));
   }
 }

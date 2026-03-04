@@ -1,6 +1,7 @@
 package com.todo.infrastructure.persistence.jpa.task;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,7 @@ public class TaskQueryRepository implements ITaskQueryRepository {
   private final TaskRepository taskRepository;
 
   @Override
-  public Optional<Task> findById(String id) {
+  public Optional<Task> findById(UUID id) {
     return taskRepository.findById(id);
   }
 

@@ -1,6 +1,7 @@
 package com.todo.application.usecase.task;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class AddSubtask {
   private final ITaskQueryRepository taskQueryRepository;
 
   @Transactional
-  public String execute(SubTaskRequest request, String loggedUserId) {
+  public UUID execute(SubTaskRequest request, String loggedUserId) {
 
     User creator = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Creator user"));

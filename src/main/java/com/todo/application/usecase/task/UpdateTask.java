@@ -1,6 +1,7 @@
 package com.todo.application.usecase.task;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class UpdateTask {
   private final ITaskQueryRepository taskQueryRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public String execute(TaskRequestUpdate request, String taskId, String loggedUserId) {
+  public UUID execute(TaskRequestUpdate request, UUID taskId, String loggedUserId) {
     Optional<User> executor = userQueryRepository.findById(loggedUserId);
 
     if (executor.isEmpty()) {

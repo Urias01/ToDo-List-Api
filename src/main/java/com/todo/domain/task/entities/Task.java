@@ -2,7 +2,9 @@ package com.todo.domain.task.entities;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import com.todo.domain.common.Auditable;
 import com.todo.domain.task.enums.TaskStatus;
@@ -10,6 +12,7 @@ import com.todo.domain.task.exception.CannotAddSubtaskToCancelledTaskException;
 import com.todo.domain.task.exception.CannotBeNullException;
 import com.todo.domain.task.exception.MaxResponsiblesReachedException;
 import com.todo.domain.task.exception.SubtaskAlreadyHasParentException;
+import com.todo.domain.task.exception.SubtaskIsNotPresentInTaskException;
 import com.todo.domain.task.exception.TaskAlreadyFinishedException;
 import com.todo.domain.task.exception.UserNotAllowedToAssignResponsibleException;
 import com.todo.domain.task.exception.UserNotAllowedToPerformActionInTask;
@@ -19,8 +22,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -38,8 +39,7 @@ import lombok.NoArgsConstructor;
 public class Task extends Auditable {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private String id;
+  private UUID id;
 
   private String title;
 
@@ -64,6 +64,7 @@ public class Task extends Auditable {
   private Set<Task> subtasks = new HashSet<>();
 
   public Task(String title, String description, User creator, TaskStatus status) {
+    this.id = UUID.randomUUID();
     if (creator == null)
       throw new IllegalArgumentException("Creator is required");
 
@@ -114,6 +115,16 @@ public class Task extends Auditable {
 
     this.subtasks.add(subtask);
     subtask.parentTask = this;
+  }
+
+  public void updateSubtask(UUID subtaskId, String title, String description, User executor) {
+    Task subtask = this.subtasks.stream().filter(x -> Objects.equals(x.getId(), subtaskId)).findFirst()
+        .orElseThrow(SubtaskIsNotPresentInTaskException::new);
+
+    subtask.assertUserCanModify(executor);
+
+    subtask.rename(title);
+    subtask.updateDescription(description);
   }
 
   public void finishSubtask(Task subtask) {

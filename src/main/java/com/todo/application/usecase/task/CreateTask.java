@@ -1,6 +1,7 @@
 package com.todo.application.usecase.task;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class CreateTask {
   private final ITaskCommandRepository taskCommandRepository;
 
   @Transactional
-  public String execute(TaskRequest request, String loggedUserId) {
+  public UUID execute(TaskRequest request, String loggedUserId) {
 
     User creator = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Creator user"));

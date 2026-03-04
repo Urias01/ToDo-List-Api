@@ -19,19 +19,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.todo.application.ports.task.ITaskCommandRepository;
 import com.todo.application.ports.task.ITaskQueryRepository;
 import com.todo.application.ports.user.IUserQueryRepository;
-import com.todo.application.usecase.task.UpdateTask;
+import com.todo.application.usecase.task.UpdateSubtask;
 import com.todo.domain.common.exceptions.NotFoundException;
 import com.todo.domain.task.entities.Task;
 import com.todo.domain.task.enums.TaskStatus;
-import com.todo.domain.task.exception.UserNotAllowedToPerformActionInTask;
 import com.todo.domain.task.presentation.requests.TaskRequestUpdate;
 import com.todo.domain.user.entities.User;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateTaskTest {
+public class UpdateSubtaskTest {
 
   @InjectMocks
-  private UpdateTask updateTask;
+  private UpdateSubtask updateSubtask;
 
   @Mock
   private ITaskCommandRepository taskCommandRepository;
@@ -43,10 +42,13 @@ public class UpdateTaskTest {
   private IUserQueryRepository userQueryRepository;
 
   @Test
-  @DisplayName("Should be able to update a task")
-  public void shouldBeAbleToUpdateUpdateATask() {
+  @DisplayName("Should be able to update a subtask")
+  public void shouldBeAbleToUpdateUpdateASubtask() {
     User creator = new User();
+
     Task task = new Task("Task", "description", creator, TaskStatus.IN_PROGRESS);
+    Task subtask = new Task("subtask", "description", creator, TaskStatus.IN_PROGRESS);
+    task.addSubtask(subtask);
 
     UUID taskId = UUID.randomUUID();
 
@@ -56,7 +58,7 @@ public class UpdateTaskTest {
 
     TaskRequestUpdate request = new TaskRequestUpdate("Updated Title", "new description");
 
-    UUID result = updateTask.execute(request, taskId, "loggedUser-123");
+    UUID result = updateSubtask.execute(taskId, subtask.getId(), request, "loggedUser-123");
 
     verify(taskCommandRepository).update(task);
     assertEquals(task.getId(), result);
@@ -68,18 +70,22 @@ public class UpdateTaskTest {
     when(userQueryRepository.findById("user-id"))
         .thenReturn(Optional.empty());
 
+    UUID taskId = UUID.randomUUID();
+    UUID subtaskId = UUID.randomUUID();
+
     assertThrows(NotFoundException.class,
-        () -> updateTask.execute(new TaskRequestUpdate("Title", "Description"), UUID.randomUUID(), "user-id"));
+        () -> updateSubtask.execute(taskId, subtaskId, new TaskRequestUpdate("Title", "Description"), "user-id"));
 
     verifyNoInteractions(taskQueryRepository);
   }
 
   @Test
-  @DisplayName("Should throw when task not found")
-  void shouldThrowWhenTaskNotFound() {
+  @DisplayName("Should throw when subtask not found")
+  void shouldThrowWhenSubtaskNotFound() {
     User user = new User();
 
     UUID taskId = UUID.randomUUID();
+    UUID subtaskId = UUID.randomUUID();
 
     when(userQueryRepository.findById("user-id"))
         .thenReturn(Optional.of(user));
@@ -88,26 +94,7 @@ public class UpdateTaskTest {
         .thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class,
-        () -> updateTask.execute(new TaskRequestUpdate("title", "description"), taskId, "user-id"));
-    verifyNoInteractions(taskCommandRepository);
-  }
-
-  @Test
-  @DisplayName("Should throw when user cannot modify")
-  void shouldThrowWhenUserCannotModify() {
-    User creator = new User();
-    User anotherUser = new User();
-    Task task = new Task("Title", "Description", creator, TaskStatus.PENDING);
-    UUID taskId = UUID.randomUUID();
-
-    when(userQueryRepository.findById("user-id"))
-        .thenReturn(Optional.of(anotherUser));
-
-    when(taskQueryRepository.findById(taskId))
-        .thenReturn(Optional.of(task));
-
-    assertThrows(UserNotAllowedToPerformActionInTask.class,
-        () -> updateTask.execute(new TaskRequestUpdate("title", "description"), taskId, "user-id"));
+        () -> updateSubtask.execute(taskId, subtaskId, new TaskRequestUpdate("title", "description"), "user-id"));
     verifyNoInteractions(taskCommandRepository);
   }
 }

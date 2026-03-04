@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,14 +52,16 @@ public class AddSubtaskTest {
 
                 parent.addResponsible(loggedUser, loggedUser);
 
-                when(taskQueryRepository.findById("parent-123"))
+                UUID parentId = UUID.randomUUID();
+
+                when(taskQueryRepository.findById(parentId))
                                 .thenReturn(Optional.of(parent));
 
                 SubTaskRequest request = new SubTaskRequest(
                                 "Subtask",
                                 "Description",
                                 List.of("user-123"),
-                                "parent-123",
+                                parentId,
                                 TaskStatus.PENDING);
 
                 when(taskCommandRepository.update(parent))
