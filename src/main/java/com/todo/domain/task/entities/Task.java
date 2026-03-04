@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.todo.domain.common.Auditable;
+import com.todo.domain.common.exceptions.NotFoundException;
 import com.todo.domain.task.enums.TaskStatus;
 import com.todo.domain.task.exception.CannotAddSubtaskToCancelledTaskException;
 import com.todo.domain.task.exception.CannotBeNullException;
@@ -235,8 +236,19 @@ public class Task extends Auditable {
     }
   }
 
+  public void changeSubtaskStatus(UUID subtaskId, TaskStatus status, User executor) {
+    assertUserCanModify(executor);
+
+    Task subtask = this.subtasks.stream()
+        .filter(s -> s.getId().equals(subtaskId))
+        .findFirst()
+        .orElseThrow(() -> new NotFoundException("Subtask"));
+
+    subtask.changeStatus(status);
+  }
+
   public void pending() {
-    if (!this.status.equals(TaskStatus.FINISHED)) {
+    if (this.status.equals(TaskStatus.FINISHED)) {
       throw new TaskAlreadyFinishedException();
     }
 

@@ -50,18 +50,16 @@ public class UpdateSubtaskTest {
     Task subtask = new Task("subtask", "description", creator, TaskStatus.IN_PROGRESS);
     task.addSubtask(subtask);
 
-    UUID taskId = UUID.randomUUID();
-
     when(userQueryRepository.findById("loggedUser-123")).thenReturn(Optional.of(creator));
 
-    when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
+    when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     TaskRequestUpdate request = new TaskRequestUpdate("Updated Title", "new description");
 
-    UUID result = updateSubtask.execute(taskId, subtask.getId(), request, "loggedUser-123");
+    UUID result = updateSubtask.execute(task.getId(), subtask.getId(), request, "loggedUser-123");
 
     verify(taskCommandRepository).update(task);
-    assertEquals(task.getId(), result);
+    assertEquals(subtask.getId(), result);
   }
 
   @Test
