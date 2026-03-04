@@ -14,6 +14,7 @@ import com.todo.domain.task.presentation.requests.TaskRequestUpdate;
 import com.todo.infrastructure.security.jwt.IJwtAuthContext;
 import com.todo.domain.common.presentation.response.ApiResponse;
 import com.todo.application.usecase.task.CreateTask;
+import com.todo.application.usecase.task.UpdateSubtask;
 import com.todo.application.usecase.task.UpdateTask;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class TaskController {
 
   private final CreateTask createTask;
   private final UpdateTask updateTask;
+  private final UpdateSubtask updateSubtask;
   private final IJwtAuthContext jwtAuthContext;
 
   @PostMapping
@@ -39,6 +41,13 @@ public class TaskController {
   public ResponseEntity<ApiResponse<UUID>> updateTask(@PathVariable UUID id,
       @RequestBody TaskRequestUpdate request) {
     UUID taskId = updateTask.execute(request, id, jwtAuthContext.getUserId());
+    return ResponseEntity.ok(ApiResponse.success(taskId));
+  }
+
+  @PutMapping("/{id}/subtask/{subtaskId}")
+  public ResponseEntity<ApiResponse<UUID>> updateSubtask(@PathVariable UUID id, @PathVariable UUID subtaskId,
+      @RequestBody TaskRequestUpdate request) {
+    UUID taskId = updateSubtask.execute(id, subtaskId, request, jwtAuthContext.getUserId());
     return ResponseEntity.ok(ApiResponse.success(taskId));
   }
 }

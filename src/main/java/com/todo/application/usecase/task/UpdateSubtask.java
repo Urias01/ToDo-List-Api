@@ -34,6 +34,6 @@ public class UpdateSubtask {
 
     taskCommandRepository.update(task);
 
-    return task.getId();
+    return subtaskId;
   }
 }
