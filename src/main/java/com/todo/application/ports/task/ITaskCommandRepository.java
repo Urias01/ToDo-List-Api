@@ -6,4 +6,6 @@ public interface ITaskCommandRepository {
   Task create(Task task);
 
   Task update(Task task);
+
+  void delete(Task task);
 }

@@ -20,12 +20,15 @@ import com.todo.application.usecase.task.AddSubtask;
 import com.todo.application.usecase.task.ChangeSubtaskStatus;
 import com.todo.application.usecase.task.ChangeTaskStatus;
 import com.todo.application.usecase.task.CreateTask;
+import com.todo.application.usecase.task.DeleteSubtask;
+import com.todo.application.usecase.task.DeleteTask;
 import com.todo.application.usecase.task.UpdateSubtask;
 import com.todo.application.usecase.task.UpdateTask;
 import com.todo.application.usecase.task.ViewTaskDetails;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +45,8 @@ public class TaskController {
   private final ChangeTaskStatus changeTaskStatus;
   private final ChangeSubtaskStatus changeSubtaskStatus;
   private final ViewTaskDetails viewTaskDetails;
+  private final DeleteTask deleteTask;
+  private final DeleteSubtask deleteSubtask;
   private final IJwtAuthContext jwtAuthContext;
 
   @PostMapping
@@ -88,5 +93,17 @@ public class TaskController {
   public ResponseEntity<ApiResponse<TaskResponse>> viewTaskDetails(@PathVariable UUID id) {
     TaskResponse response = viewTaskDetails.execute(id, jwtAuthContext.getUserId());
     return ResponseEntity.ok(ApiResponse.success(response));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<ApiResponse> deleteTask(@PathVariable UUID id) {
+    deleteTask.execute(id, jwtAuthContext.getUserId());
+    return ResponseEntity.ok(ApiResponse.success(null));
+  }
+
+  @DeleteMapping("/{id}/subtask/{subtaskId}")
+  public ResponseEntity<ApiResponse> deleteTask(@PathVariable UUID id, @PathVariable UUID subtaskId) {
+    deleteSubtask.execute(id, subtaskId, jwtAuthContext.getUserId());
+    return ResponseEntity.ok(ApiResponse.success(null));
   }
 }

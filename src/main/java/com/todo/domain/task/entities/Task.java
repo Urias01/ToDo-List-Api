@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.StructuredTaskScope.Subtask;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -131,6 +132,15 @@ public class Task extends Auditable {
 
     subtask.rename(title);
     subtask.updateDescription(description);
+  }
+
+  public void removeSubtask(UUID subtaskId, User executor) {
+    Task subtask = this.subtasks.stream().filter(x -> Objects.equals(x.getId(), subtaskId)).findFirst()
+        .orElseThrow(SubtaskIsNotPresentInTaskException::new);
+
+    subtask.assertUserCanModify(executor);
+
+    this.subtasks.remove(subtask);
   }
 
   public void finishSubtask(Task subtask) {

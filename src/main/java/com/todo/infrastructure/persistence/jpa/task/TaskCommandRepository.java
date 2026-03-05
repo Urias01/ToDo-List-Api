@@ -23,4 +23,9 @@ public class TaskCommandRepository implements ITaskCommandRepository {
     return taskRepository.save(task);
   }
 
+  @Override
+  public void delete(Task task) {
+    taskRepository.delete(task);
+  }
+
 }
