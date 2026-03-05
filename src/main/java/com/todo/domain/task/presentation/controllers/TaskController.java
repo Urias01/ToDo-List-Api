@@ -1,5 +1,6 @@
 package com.todo.domain.task.presentation.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import com.todo.application.usecase.task.ChangeTaskStatus;
 import com.todo.application.usecase.task.CreateTask;
 import com.todo.application.usecase.task.DeleteSubtask;
 import com.todo.application.usecase.task.DeleteTask;
+import com.todo.application.usecase.task.ListTasks;
 import com.todo.application.usecase.task.UpdateSubtask;
 import com.todo.application.usecase.task.UpdateTask;
 import com.todo.application.usecase.task.ViewTaskDetails;
@@ -45,6 +47,7 @@ public class TaskController {
   private final ChangeTaskStatus changeTaskStatus;
   private final ChangeSubtaskStatus changeSubtaskStatus;
   private final ViewTaskDetails viewTaskDetails;
+  private final ListTasks listTasks;
   private final DeleteTask deleteTask;
   private final DeleteSubtask deleteSubtask;
   private final IJwtAuthContext jwtAuthContext;
@@ -92,6 +95,12 @@ public class TaskController {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<TaskResponse>> viewTaskDetails(@PathVariable UUID id) {
     TaskResponse response = viewTaskDetails.execute(id, jwtAuthContext.getUserId());
+    return ResponseEntity.ok(ApiResponse.success(response));
+  }
+
+  @GetMapping()
+  public ResponseEntity<ApiResponse<List<TaskResponse>>> listTasks() {
+    List<TaskResponse> response = listTasks.execute(jwtAuthContext.getUserId());
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 

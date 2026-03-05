@@ -32,9 +32,7 @@ public class GlobalUserConfig {
     }
 
     if (userQueryRepository.findByEmail(email).isEmpty()) {
-      User globalUser = new User();
-      globalUser.changeEmail(email);
-      globalUser.changeName("Admin Global");
+      User globalUser = new User("Admin Global", email);
       globalUser.changePassword(passwordEncoder.encode(password));
       userCommandRepository.save(globalUser);
 
