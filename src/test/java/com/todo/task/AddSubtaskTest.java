@@ -61,13 +61,12 @@ public class AddSubtaskTest {
                                 "Subtask",
                                 "Description",
                                 List.of("user-123"),
-                                parentId,
                                 TaskStatus.PENDING);
 
                 when(taskCommandRepository.update(parent))
                                 .thenReturn(parent);
 
-                addSubtask.execute(request, "user-123");
+                addSubtask.execute(request, parentId, "user-123");
 
                 assertEquals(1, parent.getSubtasks().size());
                 assertTrue(parent.getSubtasks().stream()

@@ -23,6 +23,7 @@ import com.todo.application.usecase.task.ChangeSubtaskStatus;
 import com.todo.domain.task.entities.Task;
 import com.todo.domain.task.enums.TaskStatus;
 import com.todo.domain.task.exception.TaskAlreadyFinishedException;
+import com.todo.domain.task.presentation.requests.ChangeStatusRequest;
 import com.todo.domain.user.entities.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +51,8 @@ public class ChangeSubtaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
-    changeSubtaskStatus.execute(task.getId(), subtask.getId(), TaskStatus.IN_PROGRESS, anyString());
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.IN_PROGRESS);
+    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString());
 
     verify(taskCommandRepository).update(task);
     assertEquals(subtask.getStatus(), TaskStatus.IN_PROGRESS);
@@ -68,7 +70,8 @@ public class ChangeSubtaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
-    changeSubtaskStatus.execute(task.getId(), subtask.getId(), TaskStatus.FINISHED, anyString());
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.FINISHED);
+    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString());
 
     verify(taskCommandRepository).update(task);
     assertEquals(subtask.getStatus(), TaskStatus.FINISHED);
@@ -86,7 +89,8 @@ public class ChangeSubtaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
-    changeSubtaskStatus.execute(task.getId(), subtask.getId(), TaskStatus.CANCELLED, anyString());
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.CANCELLED);
+    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString());
 
     verify(taskCommandRepository).update(task);
     assertEquals(TaskStatus.CANCELLED, subtask.getStatus());
@@ -104,8 +108,9 @@ public class ChangeSubtaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.CANCELLED);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), TaskStatus.CANCELLED, anyString()));
+        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString()));
 
     verifyNoInteractions(taskCommandRepository);
   }
@@ -122,8 +127,9 @@ public class ChangeSubtaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.PENDING);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), TaskStatus.PENDING, anyString()));
+        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString()));
 
     verifyNoInteractions(taskCommandRepository);
   }
@@ -140,8 +146,9 @@ public class ChangeSubtaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.FINISHED);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), TaskStatus.FINISHED, anyString()));
+        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString()));
 
     verifyNoInteractions(taskCommandRepository);
   }

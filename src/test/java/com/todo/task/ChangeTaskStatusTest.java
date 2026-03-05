@@ -24,6 +24,7 @@ import com.todo.application.usecase.task.ChangeTaskStatus;
 import com.todo.domain.task.entities.Task;
 import com.todo.domain.task.enums.TaskStatus;
 import com.todo.domain.task.exception.TaskAlreadyFinishedException;
+import com.todo.domain.task.presentation.requests.ChangeStatusRequest;
 import com.todo.domain.user.entities.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +51,8 @@ public class ChangeTaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
 
-    changeTaskStatus.execute(taskId, TaskStatus.IN_PROGRESS, anyString());
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.IN_PROGRESS);
+    changeTaskStatus.execute(taskId, request, anyString());
 
     verify(taskCommandRepository).update(task);
     assertEquals(task.getStatus(), TaskStatus.IN_PROGRESS);
@@ -67,7 +69,8 @@ public class ChangeTaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
 
-    changeTaskStatus.execute(taskId, TaskStatus.FINISHED, anyString());
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.FINISHED);
+    changeTaskStatus.execute(taskId, request, anyString());
 
     verify(taskCommandRepository).update(task);
     assertEquals(task.getStatus(), TaskStatus.FINISHED);
@@ -84,7 +87,8 @@ public class ChangeTaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
 
-    changeTaskStatus.execute(taskId, TaskStatus.CANCELLED, anyString());
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.CANCELLED);
+    changeTaskStatus.execute(taskId, request, anyString());
 
     verify(taskCommandRepository).update(task);
     assertEquals(task.getStatus(), TaskStatus.CANCELLED);
@@ -101,8 +105,9 @@ public class ChangeTaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
 
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.CANCELLED);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeTaskStatus.execute(taskId, TaskStatus.CANCELLED, anyString()));
+        () -> changeTaskStatus.execute(taskId, request, anyString()));
 
     verifyNoInteractions(taskCommandRepository);
   }
@@ -118,8 +123,9 @@ public class ChangeTaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
 
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.PENDING);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeTaskStatus.execute(taskId, TaskStatus.PENDING, anyString()));
+        () -> changeTaskStatus.execute(taskId, request, anyString()));
 
     verifyNoInteractions(taskCommandRepository);
   }
@@ -135,8 +141,9 @@ public class ChangeTaskStatusTest {
     when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
 
+    ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.FINISHED);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeTaskStatus.execute(taskId, TaskStatus.FINISHED, anyString()));
+        () -> changeTaskStatus.execute(taskId, request, anyString()));
 
     verifyNoInteractions(taskCommandRepository);
   }

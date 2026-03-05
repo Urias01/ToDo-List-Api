@@ -27,18 +27,18 @@ public class AddSubtask {
   private final ITaskQueryRepository taskQueryRepository;
 
   @Transactional
-  public UUID execute(SubTaskRequest request, String loggedUserId) {
+  public UUID execute(SubTaskRequest request, UUID parentId, String loggedUserId) {
 
     User creator = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Creator user"));
 
     Task newSubTask = TaskMapper.toEntity(request, creator);
 
-    if (request.parentId() == null) {
+    if (parentId == null) {
       throw new IllegalArgumentException("Cannot create subtask without parent task");
     }
 
-    Task parent = taskQueryRepository.findById(request.parentId())
+    Task parent = taskQueryRepository.findById(parentId)
         .orElseThrow(() -> new NotFoundException("Parent task"));
 
     parent.assertUserCanModify(creator);

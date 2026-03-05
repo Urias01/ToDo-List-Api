@@ -45,6 +45,11 @@ public class GlobalException {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
   }
 
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<ApiResponse<Void>> handleIllegalStateException(IllegalStateException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));
+  }
+
   @ExceptionHandler(CannotBeNullException.class)
   public ResponseEntity<ApiResponse<Void>> handleCannotBeNullException(CannotBeNullException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.failure(ex.getMessage()));

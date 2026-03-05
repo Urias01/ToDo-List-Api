@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.todo.domain.task.entities.Task;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.todo.domain.common.Auditable;
 
 import jakarta.persistence.Entity;
@@ -33,8 +34,10 @@ public class User extends Auditable {
   private String email;
   private String password;
   @ManyToMany(mappedBy = "responsibles")
+  @JsonIgnore
   private Set<Task> tasks = new HashSet<>();
   @OneToMany(mappedBy = "createdBy")
+  @JsonIgnore
   private Set<Task> createdTasks = new HashSet<>();
 
 }

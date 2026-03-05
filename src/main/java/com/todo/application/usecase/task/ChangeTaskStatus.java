@@ -9,7 +9,7 @@ import com.todo.application.ports.task.ITaskQueryRepository;
 import com.todo.application.ports.user.IUserQueryRepository;
 import com.todo.domain.common.exceptions.NotFoundException;
 import com.todo.domain.task.entities.Task;
-import com.todo.domain.task.enums.TaskStatus;
+import com.todo.domain.task.presentation.requests.ChangeStatusRequest;
 import com.todo.domain.user.entities.User;
 
 import lombok.RequiredArgsConstructor;
@@ -18,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChangeTaskStatus {
 
-  private ITaskQueryRepository taskQueryRepository;
-  private ITaskCommandRepository taskCommandRepository;
-  private IUserQueryRepository userQueryRepository;
+  private final ITaskQueryRepository taskQueryRepository;
+  private final ITaskCommandRepository taskCommandRepository;
+  private final IUserQueryRepository userQueryRepository;
 
-  public UUID execute(UUID taskId, TaskStatus status, String loggedUserId) {
+  public UUID execute(UUID taskId, ChangeStatusRequest request, String loggedUserId) {
     User executor = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Logged user"));
 
@@ -31,7 +31,7 @@ public class ChangeTaskStatus {
 
     task.assertUserCanModify(executor);
 
-    task.changeStatus(status);
+    task.changeStatus(request.status());
 
     taskCommandRepository.update(task);
 

@@ -18,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateSubtask {
 
-  private ITaskCommandRepository taskCommandRepository;
-  private ITaskQueryRepository taskQueryRepository;
-  private IUserQueryRepository userQueryRepository;
+  private final ITaskCommandRepository taskCommandRepository;
+  private final ITaskQueryRepository taskQueryRepository;
+  private final IUserQueryRepository userQueryRepository;
 
   public UUID execute(UUID taskId, UUID subtaskId, TaskRequestUpdate request, String loggedUserId) {
 
