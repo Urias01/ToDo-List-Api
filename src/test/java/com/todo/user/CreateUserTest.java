@@ -1,11 +1,12 @@
 package com.todo.user;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,26 +42,25 @@ public class CreateUserTest {
   public void testCreateUserSuccess() {
     UserRequest request = new UserRequest("John Doe", "john@doe.com", "password123", "password123");
 
-    when(userQueryRepository.findByEmail(request.email())).thenReturn(Optional.empty());
-    when(passwordEncoder.encode(request.password())).thenReturn("hashedPassword");
+    when(userQueryRepository.findByEmail(request.email()))
+        .thenReturn(Optional.empty());
 
-    when(userCommandRepository.save(any(User.class))).thenAnswer(invocation -> {
-      User savedUser = invocation.getArgument(0);
-      savedUser.setId("user-1");
-      return savedUser;
-    });
+    when(passwordEncoder.encode(request.password()))
+        .thenReturn("hashedPassword");
 
-    String userId = createUser.execute(request);
+    when(userCommandRepository.save(any(User.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
-    assertEquals("user-1", userId);
+    UUID userId = createUser.execute(request);
+
+    assertNotNull(userId);
   }
 
   @Test
   @DisplayName("should throw exception when email already exists")
   public void testCreateUserEmailExists() {
     UserRequest request = new UserRequest("John Doe", "john@doe.com", "password123", "password123");
-    User existingUser = new User();
-    existingUser.setEmail(request.email());
+    User existingUser = new User("John Doe", request.email());
 
     when(userQueryRepository.findByEmail(request.email())).thenReturn(Optional.of(existingUser));
 

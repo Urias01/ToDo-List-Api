@@ -44,19 +44,19 @@ public class UpdateSubtaskTest {
   @Test
   @DisplayName("Should be able to update a subtask")
   public void shouldBeAbleToUpdateUpdateASubtask() {
-    User creator = new User();
+    User creator = new User("creator", "executor@mail.com");
 
     Task task = new Task("Task", "description", creator, TaskStatus.IN_PROGRESS);
     Task subtask = new Task("subtask", "description", creator, TaskStatus.IN_PROGRESS);
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById("loggedUser-123")).thenReturn(Optional.of(creator));
+    when(userQueryRepository.findById(creator.getId())).thenReturn(Optional.of(creator));
 
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     TaskRequestUpdate request = new TaskRequestUpdate("Updated Title", "new description");
 
-    UUID result = updateSubtask.execute(task.getId(), subtask.getId(), request, "loggedUser-123");
+    UUID result = updateSubtask.execute(task.getId(), subtask.getId(), request, creator.getId());
 
     verify(taskCommandRepository).update(task);
     assertEquals(subtask.getId(), result);
@@ -65,14 +65,15 @@ public class UpdateSubtaskTest {
   @Test
   @DisplayName("Should throw when user not found")
   void shouldThrowWhenUserNotFound() {
-    when(userQueryRepository.findById("user-id"))
+    UUID userId = UUID.randomUUID();
+    when(userQueryRepository.findById(userId))
         .thenReturn(Optional.empty());
 
     UUID taskId = UUID.randomUUID();
     UUID subtaskId = UUID.randomUUID();
 
     assertThrows(NotFoundException.class,
-        () -> updateSubtask.execute(taskId, subtaskId, new TaskRequestUpdate("Title", "Description"), "user-id"));
+        () -> updateSubtask.execute(taskId, subtaskId, new TaskRequestUpdate("Title", "Description"), userId));
 
     verifyNoInteractions(taskQueryRepository);
   }
@@ -80,19 +81,20 @@ public class UpdateSubtaskTest {
   @Test
   @DisplayName("Should throw when subtask not found")
   void shouldThrowWhenSubtaskNotFound() {
-    User user = new User();
+    User executor = new User("executor", "executor@mail.com");
 
     UUID taskId = UUID.randomUUID();
     UUID subtaskId = UUID.randomUUID();
 
-    when(userQueryRepository.findById("user-id"))
-        .thenReturn(Optional.of(user));
+    when(userQueryRepository.findById(executor.getId()))
+        .thenReturn(Optional.of(executor));
 
     when(taskQueryRepository.findById(taskId))
         .thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class,
-        () -> updateSubtask.execute(taskId, subtaskId, new TaskRequestUpdate("title", "description"), "user-id"));
+        () -> updateSubtask.execute(taskId, subtaskId, new TaskRequestUpdate("title", "description"),
+            executor.getId()));
     verifyNoInteractions(taskCommandRepository);
   }
 }

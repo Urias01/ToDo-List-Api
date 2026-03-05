@@ -2,7 +2,6 @@ package com.todo.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -48,11 +47,11 @@ public class ChangeSubtaskStatusTest {
     Task subtask = new Task("Title", "description", executor, TaskStatus.PENDING);
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.IN_PROGRESS);
-    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString());
+    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, executor.getId());
 
     verify(taskCommandRepository).update(task);
     assertEquals(subtask.getStatus(), TaskStatus.IN_PROGRESS);
@@ -67,11 +66,11 @@ public class ChangeSubtaskStatusTest {
     Task subtask = new Task("Title", "description", executor, TaskStatus.PENDING);
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.FINISHED);
-    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString());
+    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, executor.getId());
 
     verify(taskCommandRepository).update(task);
     assertEquals(subtask.getStatus(), TaskStatus.FINISHED);
@@ -86,11 +85,11 @@ public class ChangeSubtaskStatusTest {
     Task subtask = new Task("Title", "description", executor, TaskStatus.PENDING);
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.CANCELLED);
-    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString());
+    changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, executor.getId());
 
     verify(taskCommandRepository).update(task);
     assertEquals(TaskStatus.CANCELLED, subtask.getStatus());
@@ -105,12 +104,12 @@ public class ChangeSubtaskStatusTest {
     Task subtask = new Task("Title", "description", executor, TaskStatus.FINISHED);
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.CANCELLED);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString()));
+        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, executor.getId()));
 
     verifyNoInteractions(taskCommandRepository);
   }
@@ -124,12 +123,12 @@ public class ChangeSubtaskStatusTest {
     Task subtask = new Task("Title", "description", executor, TaskStatus.FINISHED);
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.PENDING);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString()));
+        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, executor.getId()));
 
     verifyNoInteractions(taskCommandRepository);
   }
@@ -143,12 +142,12 @@ public class ChangeSubtaskStatusTest {
     Task subtask = new Task("Title", "description", executor, TaskStatus.FINISHED);
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById(anyString())).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
     ChangeStatusRequest request = new ChangeStatusRequest(TaskStatus.FINISHED);
     assertThrows(TaskAlreadyFinishedException.class,
-        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, anyString()));
+        () -> changeSubtaskStatus.execute(task.getId(), subtask.getId(), request, executor.getId()));
 
     verifyNoInteractions(taskCommandRepository);
   }

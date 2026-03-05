@@ -37,8 +37,7 @@ public class ViewTaskDetailsTest {
   @Test
   @DisplayName("Should be able to view task details")
   public void shouldBeAbleToViewTaskDetails() {
-    User executor = new User();
-    executor.setId("user-123");
+    User executor = new User("executor", "executor@mail.com");
 
     Task task = new Task("title", "description", executor, TaskStatus.PENDING);
     Task subtask = new Task("title sub", "description", executor, TaskStatus.PENDING);
@@ -46,7 +45,7 @@ public class ViewTaskDetailsTest {
 
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById("user-123")).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findDetailsById(taskId)).thenReturn(Optional.of(task));
 
     TaskResponse response = viewTaskDetails.execute(taskId, executor.getId());

@@ -29,7 +29,7 @@ public class SignIn {
       throw new AuthenticationException("Invalid email or password");
     }
 
-    String token = jwtService.generateToken(user.getId().toString());
+    String token = jwtService.generateToken(user.getId());
 
     return new AuthResponse(token);
   }

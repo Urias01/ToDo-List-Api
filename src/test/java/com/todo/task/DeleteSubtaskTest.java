@@ -37,18 +37,17 @@ public class DeleteSubtaskTest {
   @Test
   @DisplayName("Should be able to delete a Subask")
   public void shouldBeAbleToDeleteASubtask() {
-    User executor = new User();
-    executor.setId("user-123");
+    User executor = new User("executor", "executor@mail.com");
 
     Task task = new Task("title", "description", executor, TaskStatus.PENDING);
     Task subtask = new Task("subtask title", "description", executor, TaskStatus.PENDING);
 
     task.addSubtask(subtask);
 
-    when(userQueryRepository.findById("user-123")).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
-    deleteSubask.execute(task.getId(), subtask.getId(), "user-123");
+    deleteSubask.execute(task.getId(), subtask.getId(), executor.getId());
 
     verify(taskCommandRepository).update(task);
     assertTrue(task.getSubtasks().isEmpty());

@@ -21,7 +21,7 @@ public class DeleteSubtask {
   private final ITaskQueryRepository taskQueryRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public void execute(UUID taskId, UUID subtaskId, String loggedUserId) {
+  public void execute(UUID taskId, UUID subtaskId, UUID loggedUserId) {
 
     User executor = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Logged user"));

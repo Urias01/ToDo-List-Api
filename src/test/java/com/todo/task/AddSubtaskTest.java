@@ -42,15 +42,14 @@ public class AddSubtaskTest {
         @DisplayName("Should be able to create a subtask")
         void shouldBeAbleToCreateASubtask() {
 
-                User loggedUser = new User();
-                loggedUser.setId("user-123");
+                User executor = new User("executor", "executor@mail.com");
 
-                when(userQueryRepository.findById("user-123"))
-                                .thenReturn(Optional.of(loggedUser));
+                when(userQueryRepository.findById(executor.getId()))
+                                .thenReturn(Optional.of(executor));
 
-                Task parent = new Task("Title", "Description", loggedUser, TaskStatus.PENDING);
+                Task parent = new Task("Title", "Description", executor, TaskStatus.PENDING);
 
-                parent.addResponsible(loggedUser, loggedUser);
+                parent.addResponsible(executor, executor);
 
                 UUID parentId = UUID.randomUUID();
 
@@ -60,13 +59,13 @@ public class AddSubtaskTest {
                 SubTaskRequest request = new SubTaskRequest(
                                 "Subtask",
                                 "Description",
-                                List.of("user-123"),
+                                List.of(executor.getId()),
                                 TaskStatus.PENDING);
 
                 when(taskCommandRepository.update(parent))
                                 .thenReturn(parent);
 
-                addSubtask.execute(request, parentId, "user-123");
+                addSubtask.execute(request, parentId, executor.getId());
 
                 assertEquals(1, parent.getSubtasks().size());
                 assertTrue(parent.getSubtasks().stream()

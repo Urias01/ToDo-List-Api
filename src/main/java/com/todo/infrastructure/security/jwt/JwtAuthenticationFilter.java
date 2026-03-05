@@ -2,6 +2,7 @@ package com.todo.infrastructure.security.jwt;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       filterChain.doFilter(request, response);
       throw new BadCredentialsException("Token inválido ou expirado");
     }
-    String userId = jwtService.extractUserId(token);
+    UUID userId = jwtService.extractUserId(token);
     User user = userQueryRepository.findById(userId).orElse(null);
 
     if (user != null) {

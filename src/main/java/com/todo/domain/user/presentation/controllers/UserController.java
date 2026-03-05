@@ -1,5 +1,7 @@
 package com.todo.domain.user.presentation.controllers;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +23,8 @@ public class UserController {
   private final CreateUser createUser;
 
   @PostMapping()
-  public ResponseEntity<ApiResponse<String>> createUser(@RequestBody UserRequest request) {
-    String userId = createUser.execute(request);
+  public ResponseEntity<ApiResponse<UUID>> createUser(@RequestBody UserRequest request) {
+    UUID userId = createUser.execute(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(userId));
   }
 

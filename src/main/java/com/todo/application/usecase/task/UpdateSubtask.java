@@ -22,7 +22,7 @@ public class UpdateSubtask {
   private final ITaskQueryRepository taskQueryRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public UUID execute(UUID taskId, UUID subtaskId, TaskRequestUpdate request, String loggedUserId) {
+  public UUID execute(UUID taskId, UUID subtaskId, TaskRequestUpdate request, UUID loggedUserId) {
 
     User executor = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("logged user"));

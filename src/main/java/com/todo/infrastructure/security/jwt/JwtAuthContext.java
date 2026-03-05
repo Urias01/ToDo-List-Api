@@ -1,12 +1,14 @@
 package com.todo.infrastructure.security.jwt;
 
+import java.util.UUID;
+
 public class JwtAuthContext {
-  
+
   private static final ThreadLocal<JwtAuthContext> context = new ThreadLocal<>();
 
-  private final String userId;
+  private final UUID userId;
 
-  public JwtAuthContext(String userId) {
+  public JwtAuthContext(UUID userId) {
     this.userId = userId;
   }
 
@@ -22,7 +24,7 @@ public class JwtAuthContext {
     context.remove();
   }
 
-  public String getUserId() {
+  public UUID getUserId() {
     return userId;
   }
 }

@@ -21,7 +21,7 @@ public class ViewTaskDetails {
   private final ITaskQueryRepository taskQueryRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public TaskResponse execute(UUID taskId, String loggedUserId) {
+  public TaskResponse execute(UUID taskId, UUID loggedUserId) {
 
     User executor = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Logged user"));

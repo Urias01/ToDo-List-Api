@@ -25,7 +25,7 @@ public class CreateTask {
   private final ITaskCommandRepository taskCommandRepository;
 
   @Transactional
-  public UUID execute(TaskRequest request, String loggedUserId) {
+  public UUID execute(TaskRequest request, UUID loggedUserId) {
 
     User creator = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Creator user"));

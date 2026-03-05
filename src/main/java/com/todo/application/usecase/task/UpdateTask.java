@@ -24,7 +24,7 @@ public class UpdateTask {
   private final ITaskQueryRepository taskQueryRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public UUID execute(TaskRequestUpdate request, UUID taskId, String loggedUserId) {
+  public UUID execute(TaskRequestUpdate request, UUID taskId, UUID loggedUserId) {
     Optional<User> executor = userQueryRepository.findById(loggedUserId);
 
     if (executor.isEmpty()) {

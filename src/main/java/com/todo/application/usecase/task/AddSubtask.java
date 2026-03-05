@@ -27,7 +27,7 @@ public class AddSubtask {
   private final ITaskQueryRepository taskQueryRepository;
 
   @Transactional
-  public UUID execute(SubTaskRequest request, UUID parentId, String loggedUserId) {
+  public UUID execute(SubTaskRequest request, UUID parentId, UUID loggedUserId) {
 
     User creator = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Creator user"));

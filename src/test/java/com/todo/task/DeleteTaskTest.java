@@ -36,15 +36,14 @@ public class DeleteTaskTest {
   @Test
   @DisplayName("Should be able to delete a Task")
   public void shouldBeAbleToDeleteATask() {
-    User executor = new User();
-    executor.setId("user-123");
+    User executor = new User("executor", "executor@mail.com");
 
     Task task = new Task("title", "description", executor, TaskStatus.PENDING);
 
-    when(userQueryRepository.findById("user-123")).thenReturn(Optional.of(executor));
+    when(userQueryRepository.findById(executor.getId())).thenReturn(Optional.of(executor));
     when(taskQueryRepository.findById(task.getId())).thenReturn(Optional.of(task));
 
-    deleteTask.execute(task.getId(), "user-123");
+    deleteTask.execute(task.getId(), executor.getId());
 
     verify(taskCommandRepository).delete(task);
   }

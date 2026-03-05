@@ -45,18 +45,18 @@ public class UpdateTaskTest {
   @Test
   @DisplayName("Should be able to update a task")
   public void shouldBeAbleToUpdateUpdateATask() {
-    User creator = new User();
+    User creator = new User("creator", "creator@mail.com");
     Task task = new Task("Task", "description", creator, TaskStatus.IN_PROGRESS);
 
     UUID taskId = UUID.randomUUID();
 
-    when(userQueryRepository.findById("loggedUser-123")).thenReturn(Optional.of(creator));
+    when(userQueryRepository.findById(creator.getId())).thenReturn(Optional.of(creator));
 
     when(taskQueryRepository.findById(taskId)).thenReturn(Optional.of(task));
 
     TaskRequestUpdate request = new TaskRequestUpdate("Updated Title", "new description");
 
-    UUID result = updateTask.execute(request, taskId, "loggedUser-123");
+    UUID result = updateTask.execute(request, taskId, creator.getId());
 
     verify(taskCommandRepository).update(task);
     assertEquals(task.getId(), result);
@@ -65,11 +65,13 @@ public class UpdateTaskTest {
   @Test
   @DisplayName("Should throw when user not found")
   void shouldThrowWhenUserNotFound() {
-    when(userQueryRepository.findById("user-id"))
+    User creator = new User("creator", "creator@mail.com");
+
+    when(userQueryRepository.findById(creator.getId()))
         .thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class,
-        () -> updateTask.execute(new TaskRequestUpdate("Title", "Description"), UUID.randomUUID(), "user-id"));
+        () -> updateTask.execute(new TaskRequestUpdate("Title", "Description"), UUID.randomUUID(), creator.getId()));
 
     verifyNoInteractions(taskQueryRepository);
   }
@@ -77,37 +79,37 @@ public class UpdateTaskTest {
   @Test
   @DisplayName("Should throw when task not found")
   void shouldThrowWhenTaskNotFound() {
-    User user = new User();
+    User creator = new User("creator", "creator@mail.com");
 
     UUID taskId = UUID.randomUUID();
 
-    when(userQueryRepository.findById("user-id"))
-        .thenReturn(Optional.of(user));
+    when(userQueryRepository.findById(creator.getId()))
+        .thenReturn(Optional.of(creator));
 
     when(taskQueryRepository.findById(taskId))
         .thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class,
-        () -> updateTask.execute(new TaskRequestUpdate("title", "description"), taskId, "user-id"));
+        () -> updateTask.execute(new TaskRequestUpdate("title", "description"), taskId, creator.getId()));
     verifyNoInteractions(taskCommandRepository);
   }
 
   @Test
   @DisplayName("Should throw when user cannot modify")
   void shouldThrowWhenUserCannotModify() {
-    User creator = new User();
+    User creator = new User("creator", "creator@mail.com");
     User anotherUser = new User();
     Task task = new Task("Title", "Description", creator, TaskStatus.PENDING);
     UUID taskId = UUID.randomUUID();
 
-    when(userQueryRepository.findById("user-id"))
+    when(userQueryRepository.findById(creator.getId()))
         .thenReturn(Optional.of(anotherUser));
 
     when(taskQueryRepository.findById(taskId))
         .thenReturn(Optional.of(task));
 
     assertThrows(UserNotAllowedToPerformActionInTask.class,
-        () -> updateTask.execute(new TaskRequestUpdate("title", "description"), taskId, "user-id"));
+        () -> updateTask.execute(new TaskRequestUpdate("title", "description"), taskId, creator.getId()));
     verifyNoInteractions(taskCommandRepository);
   }
 }

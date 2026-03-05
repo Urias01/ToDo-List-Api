@@ -21,7 +21,7 @@ public class DeleteTask {
   private final ITaskQueryRepository taskQueryRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public void execute(UUID taskId, String loggedUserId) {
+  public void execute(UUID taskId, UUID loggedUserId) {
 
     User executor = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Logged user"));

@@ -33,9 +33,9 @@ public class GlobalUserConfig {
 
     if (userQueryRepository.findByEmail(email).isEmpty()) {
       User globalUser = new User();
-      globalUser.setEmail(email);
-      globalUser.setName("Admin Global");
-      globalUser.setPassword(passwordEncoder.encode(password));
+      globalUser.changeEmail(email);
+      globalUser.changeName("Admin Global");
+      globalUser.changePassword(passwordEncoder.encode(password));
       userCommandRepository.save(globalUser);
 
       System.out.println("Usuário global criado!");

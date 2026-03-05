@@ -1,6 +1,7 @@
 package com.todo.domain.task.presentation.requests;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.util.StringUtils;
 
@@ -10,7 +11,7 @@ import com.todo.domain.task.enums.TaskStatus;
 public record TaskRequest(
     String title,
     String description,
-    List<String> userIds,
+    List<UUID> userIds,
     @JsonProperty(defaultValue = "PENDING") TaskStatus status) {
   public TaskRequest {
     if (!StringUtils.hasText(title)) {

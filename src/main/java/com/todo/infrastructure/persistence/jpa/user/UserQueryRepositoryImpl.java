@@ -1,6 +1,7 @@
 package com.todo.infrastructure.persistence.jpa.user;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,7 @@ public class UserQueryRepositoryImpl implements IUserQueryRepository {
   private final UserRepository userRepository;
 
   @Override
-  public Optional<User> findById(String id) {
+  public Optional<User> findById(UUID id) {
     return userRepository.findById(id);
   }
 

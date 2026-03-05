@@ -27,51 +27,46 @@ import com.todo.application.usecase.task.CreateTask;
 @ExtendWith(MockitoExtension.class)
 public class CreateTaskTest {
 
-  @InjectMocks
-  private CreateTask createTask;
+        @InjectMocks
+        private CreateTask createTask;
 
-  @Mock
-  private IUserQueryRepository userQueryRepository;
+        @Mock
+        private IUserQueryRepository userQueryRepository;
 
-  @Mock
-  private ITaskQueryRepository taskQueryRepository;
+        @Mock
+        private ITaskQueryRepository taskQueryRepository;
 
-  @Mock
-  private ITaskCommandRepository taskCommandRepository;
+        @Mock
+        private ITaskCommandRepository taskCommandRepository;
 
-  @Test
-  @DisplayName("Should create a task with responsible user successfully")
-  void shouldCreateTaskSuccessfully() {
+        @Test
+        @DisplayName("Should create a task with responsible user successfully")
+        void shouldCreateTaskSuccessfully() {
 
-    String loggedUserId = "creator-1";
-    String responsibleId = "user-123";
+                User creator = new User("creator", "creator@mail.com");
 
-    TaskRequest request = new TaskRequest(
-        "Test Task",
-        "Description",
-        List.of(responsibleId),
-        null);
+                User responsible = new User("responsible", "responsible@mail.com");
 
-    User creator = new User();
-    creator.setId(loggedUserId);
+                TaskRequest request = new TaskRequest(
+                                "Test Task",
+                                "Description",
+                                List.of(responsible.getId()),
+                                null);
 
-    User responsible = new User();
-    responsible.setId(responsibleId);
+                when(userQueryRepository.findById(creator.getId()))
+                                .thenReturn(Optional.of(creator));
 
-    when(userQueryRepository.findById(loggedUserId))
-        .thenReturn(Optional.of(creator));
+                when(userQueryRepository.findById(responsible.getId()))
+                                .thenReturn(Optional.of(responsible));
 
-    when(userQueryRepository.findById(responsibleId))
-        .thenReturn(Optional.of(responsible));
+                when(taskCommandRepository.create(any(Task.class)))
+                                .thenAnswer(invocation -> invocation.getArgument(0));
 
-    when(taskCommandRepository.create(any(Task.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
+                UUID taskId = createTask.execute(request, creator.getId());
 
-    UUID taskId = createTask.execute(request, loggedUserId);
+                assertNotNull(taskId);
 
-    assertNotNull(taskId);
-
-    verify(taskCommandRepository).create(argThat(task -> task.getResponsibles().stream()
-        .anyMatch(u -> responsibleId.equals(u.getId()))));
-  }
+                verify(taskCommandRepository).create(argThat(task -> task.getResponsibles().stream()
+                                .anyMatch(u -> responsible.getId().equals(u.getId()))));
+        }
 }

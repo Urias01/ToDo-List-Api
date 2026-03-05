@@ -37,16 +37,14 @@ public class SignInTest {
   @Test
   @DisplayName("Should sign in user successfully")
   public void shouldSignInUserSuccessfully() {
-    User user = new User();
-    user.setId("userId");
-    user.setEmail("email@test.com");
-    user.setPassword("encodedPassword");
+    User user = new User("user", "user@mail.com");
+    user.changePassword("encodedPassword");
 
-    AuthRequest request = new AuthRequest("email@test.com", "password");
+    AuthRequest request = new AuthRequest("user@mail.com", "password");
 
-    when(userQueryRepository.findByEmail("email@test.com")).thenReturn(Optional.of(user));
+    when(userQueryRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
     when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
-    when(jwtService.generateToken("userId")).thenReturn("token");
+    when(jwtService.generateToken(user.getId())).thenReturn("token");
 
     AuthResponse response = signIn.execute(request);
     assert response != null;
@@ -69,9 +67,8 @@ public class SignInTest {
     AuthRequest request = new AuthRequest("email@test.com", "invalidPassword");
 
     User user = new User();
-    user.setId("userId");
-    user.setEmail("email@test.com");
-    user.setPassword("encodedPassword");
+    user.changeEmail("email@test.com");
+    user.changePassword("encodedPassword");
 
     when(userQueryRepository.findByEmail("email@test.com")).thenReturn(Optional.of(user));
     when(passwordEncoder.matches("invalidPassword", "encodedPassword")).thenReturn(false);

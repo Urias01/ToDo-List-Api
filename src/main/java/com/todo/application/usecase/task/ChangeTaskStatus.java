@@ -22,7 +22,7 @@ public class ChangeTaskStatus {
   private final ITaskCommandRepository taskCommandRepository;
   private final IUserQueryRepository userQueryRepository;
 
-  public UUID execute(UUID taskId, ChangeStatusRequest request, String loggedUserId) {
+  public UUID execute(UUID taskId, ChangeStatusRequest request, UUID loggedUserId) {
     User executor = userQueryRepository.findById(loggedUserId)
         .orElseThrow(() -> new NotFoundException("Logged user"));
 
