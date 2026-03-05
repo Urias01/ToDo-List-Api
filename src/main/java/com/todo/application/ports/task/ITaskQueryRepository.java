@@ -7,4 +7,6 @@ import com.todo.domain.task.entities.Task;
 
 public interface ITaskQueryRepository {
   Optional<Task> findById(UUID id);
+
+  Optional<Task> findDetailsById(UUID id);
 }

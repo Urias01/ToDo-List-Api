@@ -4,6 +4,7 @@ import com.todo.domain.task.entities.Task;
 import com.todo.domain.task.presentation.requests.SubTaskRequest;
 import com.todo.domain.task.presentation.requests.TaskRequest;
 import com.todo.domain.task.presentation.requests.TaskRequestUpdate;
+import com.todo.domain.task.presentation.responses.TaskResponse;
 import com.todo.domain.user.entities.User;
 import com.todo.domain.task.enums.TaskStatus;
 
@@ -24,5 +25,16 @@ public class TaskMapper {
   public static void updateEntity(Task task, TaskRequestUpdate request) {
     task.rename(request.title());
     task.updateDescription(request.description());
+  }
+
+  public static TaskResponse toResponse(Task task) {
+    return new TaskResponse(
+        task.getId(),
+        task.getTitle(),
+        task.getDescription(),
+        task.getCreatedBy(),
+        task.getSubtasks(),
+        task.getFinishDate(),
+        task.getCreatedAt());
   }
 }

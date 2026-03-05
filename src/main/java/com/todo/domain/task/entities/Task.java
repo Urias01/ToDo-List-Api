@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.todo.domain.common.Auditable;
 import com.todo.domain.common.exceptions.NotFoundException;
 import com.todo.domain.task.enums.TaskStatus;
@@ -60,8 +62,11 @@ public class Task extends Auditable {
 
   @ManyToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
+  @JsonBackReference
   private Task parentTask;
+
   @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference
   private Set<Task> subtasks = new HashSet<>();
 
   public Task(String title, String description, User creator, TaskStatus status) {
@@ -305,6 +310,10 @@ public class Task extends Auditable {
     }
 
     return;
+  }
+
+  public void assertUserCanView(User creator) {
+    assertUserCanModify(creator);
   }
 
 }

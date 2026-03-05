@@ -13,10 +13,10 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
 
   @Query("""
       SELECT t FROM Task t
-      LEFT JOIN FETCH t.users
+      LEFT JOIN FETCH t.createdBy
+      LEFT JOIN FETCH t.responsibles
       LEFT JOIN FETCH t.subtasks
       WHERE t.id = :id
       """)
   Optional<Task> findByIdWithDetails(UUID id);
-
 }

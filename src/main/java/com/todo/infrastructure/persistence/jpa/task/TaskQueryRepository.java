@@ -21,4 +21,9 @@ public class TaskQueryRepository implements ITaskQueryRepository {
     return taskRepository.findById(id);
   }
 
+  @Override
+  public Optional<Task> findDetailsById(UUID id) {
+    return taskRepository.findByIdWithDetails(id);
+  }
+
 }
