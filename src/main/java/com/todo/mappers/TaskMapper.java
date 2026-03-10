@@ -32,6 +32,7 @@ public class TaskMapper {
         task.getId(),
         task.getTitle(),
         task.getDescription(),
+        task.getStatus(),
         task.getCreatedBy(),
         task.getSubtasks(),
         task.getFinishDate(),
