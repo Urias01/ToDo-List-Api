@@ -105,13 +105,13 @@ public class TaskController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<ApiResponse> deleteTask(@PathVariable UUID id) {
+  public ResponseEntity<ApiResponse<Object>> deleteTask(@PathVariable UUID id) {
     deleteTask.execute(id, jwtAuthContext.getUserId());
     return ResponseEntity.ok(ApiResponse.success(null));
   }
 
   @DeleteMapping("/{id}/subtask/{subtaskId}")
-  public ResponseEntity<ApiResponse> deleteTask(@PathVariable UUID id, @PathVariable UUID subtaskId) {
+  public ResponseEntity<ApiResponse<Object>> deleteTask(@PathVariable UUID id, @PathVariable UUID subtaskId) {
     deleteSubtask.execute(id, subtaskId, jwtAuthContext.getUserId());
     return ResponseEntity.ok(ApiResponse.success(null));
   }
