@@ -31,6 +31,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,6 +68,7 @@ public class Task extends Auditable {
 
   @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
+  @OrderBy("createdAt ASC")
   private Set<Task> subtasks = new HashSet<>();
 
   public Task(String title, String description, User creator, TaskStatus status) {
@@ -259,6 +261,11 @@ public class Task extends Auditable {
         .orElseThrow(() -> new NotFoundException("Subtask"));
 
     subtask.changeStatus(status);
+
+    if (this.status.equals(TaskStatus.PENDING)
+        && (!subtask.getStatus().equals(TaskStatus.PENDING) || !subtask.getStatus().equals(TaskStatus.CANCELLED))) {
+      this.changeStatus(TaskStatus.IN_PROGRESS);
+    }
   }
 
   public void pending() {
